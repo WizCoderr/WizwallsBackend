@@ -2,9 +2,10 @@
   "name": "wallpaperappbackend",
   "version": "1.0.0",
   "description": "Wallaper App Backend",
-  "main": "main.ts",
+  "main": "app.ts",
   "scripts": {
-    "dev":"bun --watch src/main.ts"
+    "dev":"bun --watch src/app.ts",
+    "start": "bun --watch src/app.ts"
   },
   "type": "module",
   "author": "wizcoderr",
