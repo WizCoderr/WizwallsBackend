@@ -5,17 +5,23 @@ import { submitReport } from './FileHandling.js';
 export default class MongoAPI {
 
     async connectMongoose(url: string) {
-        var isConnected = false
-        await mongoose.connect(url)
-            .then(() => {
-                isConnected = true
-                console.log('Connected to MongoDB');
-            })
-            .catch((error) => {
-                console.error('Error connecting to MongoDB:', error);
+        var isConnected = false;
+        try {
+            await mongoose.connect(url, {
+                serverSelectionTimeoutMS: 5000, // Timeout after 5s
+                retryWrites: true,
+                w: 'majority',
             });
-
-        return isConnected
+            isConnected = true;
+            console.log('Connected to MongoDB');
+        } catch (error:any) {
+            console.error('Error connecting to MongoDB:', error);
+            // Log specific error for deployment issues
+            if (error.name === 'MongooseServerSelectionError') {
+                console.error('IP Address not whitelisted in MongoDB Atlas');
+            }
+        }
+        return isConnected;
     }
 
 
