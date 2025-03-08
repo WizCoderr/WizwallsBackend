@@ -16,7 +16,7 @@ import MongoAPI from './Mongo.js'
 dotenv.config()
 
 const atlas = process.env.ATLAS_URI || '';
-const port = process.env.EXPRESS_PORT || 3001;
+const port = process.env.EXPRESS_PORT || 8000;
 const unsplashApiKey1 = process.env.UNSPLASH_API_KEY1 || '';
 const unsplashApiKey2 = process.env.UNSPLASH_API_KEY2 || '';
 const unsplashApiKey3 = process.env.UNSPLASH_API_KEY3 || '';
@@ -24,8 +24,7 @@ const unsplashApiKey4 = process.env.UNSPLASH_API_KEY4 || '';
 const unsplashApiKey5 = process.env.UNSPLASH_API_KEY5 || '';
 const unsplashApiKey6 = process.env.UNSPLASH_API_KEY6 || '';
 
-const isServer = process.env.IS_SERVER == 'true' || true
-
+const isServer = process.env.IS_SERVER == 'true' || false
 
 const app = express()
 app.use(cors())
@@ -113,7 +112,7 @@ function changeUnsplashApi() {
 //   categoriesName: [],
 //   collections: []
 // }
-
+//
 // await saveFile(temp)
 
 
@@ -131,7 +130,7 @@ app.use((req, res, next) => {
 })
 
 app.get('/admin/*',(req, res, next) => {
-  if (isServer == true) {
+  if (isServer) {
     res.status(403).send("This request is restricted on server side")
   } else {
     next()
@@ -151,6 +150,26 @@ app.get('/public/category', async (req, res) => {
   } else {
     res.status(200).json(result)
   }
+})
+
+app.get('/public/getAllWallpapers', async (req, res) => {
+    try {
+        const page = parseInt(req.query.page as string)
+
+        if (page < 1) throw "page index must be greater than 0"
+        const result = await mongoApi.getAllWallpapers(page)
+
+        if (result == null) {
+        res.status(500).send("Server Internal Error")
+        } else {
+        res.status(200).json(result)
+        }
+
+    } catch (error) {
+
+        console.log(error)
+        res.status(400).send("Bad Request")
+    }
 })
 
 
@@ -317,14 +336,14 @@ let isOver = false;
 app.get('/start', async (req, res) => {
   console.log("fetching start request")
 
-  if (isOver == true) {
+  if (isOver) {
     res.send("Collection Over")
     return
   }
 
-  if (isStarting == false) {
+  if (!isStarting) {
     isStarting = true
-    startFetchAndUpload()
+    await startFetchAndUpload()
     res.send("Started")
   } else {
     res.send("Already started")
@@ -354,7 +373,7 @@ async function startFetchAndUpload() {
     while (true) {
 
       // break the loop if not allowed
-      if (isStarting == false) {
+      if (!isStarting) {
         console.log("Fetching stopped successfully")
         return
       }
@@ -378,7 +397,7 @@ async function startFetchAndUpload() {
       console.log("Sending to mongo...")
 
       // create collection if it is first page of collection
-      if (data.isFirst == true) {
+      if (data.isFirst) {
 
         // making title first letter capital
         let title = progressQuery.categoriesName[data.index].toLowerCase()
@@ -394,7 +413,7 @@ async function startFetchAndUpload() {
           blur_hash: categoryRawData.blur_hash
         }
 
-        if (await mongoApi.createCollection(category) == false) {
+        if (!await mongoApi.createCollection(category)) {
 
           console.log("Fetching stopped due to error")
           isStarting = false
@@ -403,7 +422,7 @@ async function startFetchAndUpload() {
       }
 
       // add wallpapers to server and close the loop if error occurs
-      if (await mongoApi.addWallpapers(data.wallpapers) == false) {
+      if (!await mongoApi.addWallpapers(data.wallpapers)) {
 
         console.log("Fetching stopped due to error")
         isStarting = false
@@ -421,7 +440,7 @@ async function startFetchAndUpload() {
     }
   } catch (error: any) {
     isStarting = false
-    submitReport(error.toString())
+    await submitReport(error.toString())
   }
 }
 

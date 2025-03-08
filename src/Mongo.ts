@@ -92,6 +92,23 @@ export default class MongoAPI {
         }
     }
 
+    async getAllWallpapers(page: number) {
+        try {
+            const pageSize = 30;                    // Number of documents per page
+            const skip = (page - 1) * pageSize;     // Calculate the number of documents to skip
+
+            return await Wallpaper.find()
+                .sort({ created_at: -1 })
+                .skip(skip)
+                .limit(pageSize)
+                .select('-__v') as Array<WallpaperData>;
+
+        } catch (error: any) {
+
+            await submitReport(error.message + "\nby getAllWallpapers()")
+            return null;
+        }
+    }
     async getWallpapers(categoryId: string, page: number) {
         try {
             const pageSize = 30;                    // Number of documents per page
