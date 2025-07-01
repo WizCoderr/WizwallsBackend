@@ -1,4 +1,4 @@
-
+    
 
 export interface WallpaperData {
     _id: string,

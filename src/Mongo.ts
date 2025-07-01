@@ -5,13 +5,9 @@ import { submitReport } from './FileHandling.js';
 export default class MongoAPI {
 
     async connectMongoose(url: string) {
-        var isConnected = false;
+        let isConnected = false;
         try {
-            await mongoose.connect(url, {
-                serverSelectionTimeoutMS: 5000, // Timeout after 5s
-                retryWrites: true,
-                w: 'majority',
-            });
+            await mongoose.connect(url);
             isConnected = true;
             console.log('Connected to MongoDB');
         } catch (error:any) {
@@ -28,7 +24,6 @@ export default class MongoAPI {
 
 
     // -------------------- requests ----------------------
-
     async addWallpapers(wallpapers: Array<WallpaperData>) {
         try {
             const bulkOps = wallpapers.map((wallpaper) => ({

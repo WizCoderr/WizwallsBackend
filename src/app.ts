@@ -24,7 +24,8 @@ const unsplashApiKey4 = process.env.UNSPLASH_API_KEY4 || '';
 const unsplashApiKey5 = process.env.UNSPLASH_API_KEY5 || '';
 const unsplashApiKey6 = process.env.UNSPLASH_API_KEY6 || '';
 
-const isServer = process.env.IS_SERVER == 'true' || false
+// const isServer = process.env.IS_SERVER == 'true' || false
+const isServer = false
 
 const app = express()
 app.use(cors())
@@ -235,17 +236,11 @@ app.get('/public/wallpaper/search/:query/:page', async (req, res) => {
 
 
 
-
-
-
-
-
 // --------------------- Testing Request -----------------------------
 
 app.get('/', (req, res) => {
   res.send('Server is working')
 })
-
 
 
 
@@ -385,7 +380,7 @@ async function startFetchAndUpload() {
       let data = await fetchNextPhotos()
       console.log("fetched data: " + data.count + "  Result: " + data.wallpapers.length + "    page: " + data.page)
 
-      // close the loop if collection is empty
+      // close the loop if a collection is empty
       if (data.count == 0) {
         console.log('Collection over')
         isOver = true
@@ -444,8 +439,6 @@ async function startFetchAndUpload() {
   }
 }
 
-
-// return true when photo fetch available otherwise false
 async function fetchNextPhotos() {
 
   const currentFetchCollection = findCurrentFetchingCollection(progressQuery.photoIndex)
@@ -495,7 +488,6 @@ async function fetchNextPhotos() {
     });
 
 
-    // sorting collection by most likes
     if (photoCollection.length > 5) {
       photoCollection.sort(function (a, b) {
         return b.likes - a.likes;
@@ -545,10 +537,8 @@ function findCurrentFetchingCollection(currentPos: number) {
       if (currentPos < totalCount) {
         data.collectionId = sub.id
 
-        // notify that to create category, if it is first sub collection
         if(loopCount == 1) data.isFirst = true
 
-        // photo index relative to sub collection
         let relPhotoIndex = (currentPos - (totalCount - sub.count))
 
         console.log("RelPhotoIndex: " + relPhotoIndex)
@@ -627,3 +617,7 @@ function collectCategoryData(collections: Collections) {
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
+function calcWallpaperCount() {
+  throw new Error('Function not implemented.');
+}
+
