@@ -10,7 +10,7 @@ import { Collections } from 'unsplash-js/dist/methods/search/types/response';
 import { delay } from './Utils.js';
 import MongoAPI from './Mongo.js'
 import swaggerUi from 'swagger-ui-express';
-
+import swaggerDocument from './docs.js';
 
 
 dotenv.config()
@@ -113,7 +113,7 @@ function changeUnsplashApi() {
 //   categoriesName: [],
 //   collections: []
 // }
-//
+
 // await saveFile(temp)
 
 
@@ -348,6 +348,7 @@ app.get('/start', async (req, res) => {
 
 app.get('/stop', async (req, res) => {
   console.log("stop request sended")
+  await saveFile(progressQuery)
 
   isStarting = false
   res.send("Stopping")
