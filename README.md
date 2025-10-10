@@ -36,6 +36,7 @@ UNSPLASH_API_KEY3=your_unsplash_api_key_3
 UNSPLASH_API_KEY4=your_unsplash_api_key_4
 UNSPLASH_API_KEY5=your_unsplash_api_key_5
 UNSPLASH_API_KEY6=your_unsplash_api_key_6
+IS_SERVER=false
 ```
 
 ## Usage
@@ -58,17 +59,80 @@ GET /public/category
 ```
 Returns all available wallpaper categories.
 
+Response:
+```json
+[
+  {
+    "_id": "string",
+    "title": "string",
+    "cover_photo": "string",
+    "blur_hash": "string"
+  }
+]
+```
+
 #### Get All Wallpapers (Paginated)
 ```
-GET /public/getAllWallpapers?page=1
+GET /public/getAllWallpapers?page={page_number}
 ```
 Returns all wallpapers with pagination.
 
+Parameters:
+- `page` (integer, required): Page number (starting from 1)
+
+Response:
+```json
+{
+  "wallpapers": [
+    {
+      "_id": "string",
+      "category_id": "string",
+      "created_at": "integer",
+      "width": "integer",
+      "height": "integer",
+      "color": "string",
+      "blur_hash": "string",
+      "description": "string",
+      "image_url": "string",
+      "likes": "integer",
+      "is_premium": "boolean"
+    }
+  ],
+  "hasNext": "boolean"
+}
+```
+
 #### Get Wallpapers by Category
 ```
-GET /public/wallpapers?id={collectionId}&page=1
+GET /public/wallpapers?id={collectionId}&page={page_number}
 ```
 Returns wallpapers for a specific category.
+
+Parameters:
+- `id` (string, required): Collection ID
+- `page` (integer, required): Page number (starting from 1)
+
+Response:
+```json
+{
+  "wallpapers": [
+    {
+      "_id": "string",
+      "category_id": "string",
+      "created_at": "integer",
+      "width": "integer",
+      "height": "integer",
+      "color": "string",
+      "blur_hash": "string",
+      "description": "string",
+      "image_url": "string",
+      "likes": "integer",
+      "is_premium": "boolean"
+    }
+  ],
+  "hasNext": "boolean"
+}
+```
 
 #### Get Single Wallpaper
 ```
@@ -76,11 +140,57 @@ GET /public/wallpaper/{id}
 ```
 Returns details for a specific wallpaper.
 
+Parameters:
+- `id` (string, required): Wallpaper ID
+
+Response:
+```json
+{
+  "_id": "string",
+  "category_id": "string",
+  "created_at": "integer",
+  "width": "integer",
+  "height": "integer",
+  "color": "string",
+  "blur_hash": "string",
+  "description": "string",
+  "image_url": "string",
+  "likes": "integer",
+  "is_premium": "boolean"
+}
+```
+
 #### Search Wallpapers
 ```
 GET /public/wallpaper/search/{query}/{page}
 ```
 Search wallpapers by query string.
+
+Parameters:
+- `query` (string, required): Search query
+- `page` (integer, required): Page number (starting from 1)
+
+Response:
+```json
+{
+  "wallpapers": [
+    {
+      "_id": "string",
+      "category_id": "string",
+      "created_at": "integer",
+      "width": "integer",
+      "height": "integer",
+      "color": "string",
+      "blur_hash": "string",
+      "description": "string",
+      "image_url": "string",
+      "likes": "integer",
+      "is_premium": "boolean"
+    }
+  ],
+  "hasNext": "boolean"
+}
+```
 
 ### Admin Endpoints
 
@@ -92,11 +202,98 @@ GET /admin/collections/{name}
 ```
 Search Unsplash collections by name.
 
+Parameters:
+- `name` (string, required): Collection name to search for
+
+Response:
+```json
+{
+  "id": "string",
+  "title": "string",
+  "cover_photo": "string",
+  "blur_hash": "string",
+  "sub_collection": [
+    {
+      "id": "string",
+      "count": "integer"
+    }
+  ]
+}
+```
+
+#### Get Latest Collections
+```
+GET /admin/latest
+```
+Get the latest collections from Unsplash.
+
+Response:
+```json
+{
+  "results": [
+    {
+      "id": "string",
+      "title": "string",
+      "description": "string",
+      "published_at": "string",
+      "last_collected_at": "string",
+      "updated_at": "string",
+      "curated": "boolean",
+      "featured": "boolean",
+      "total_photos": "integer",
+      "private": "boolean",
+      "share_key": "string",
+      "cover_photo": {
+        "id": "string",
+        "width": "integer",
+        "height": "integer",
+        "color": "string",
+        "blur_hash": "string",
+        "urls": {
+          "raw": "string",
+          "full": "string",
+          "regular": "string",
+          "small": "string",
+          "thumb": "string"
+        }
+      }
+    }
+  ]
+}
+```
+
 #### Get Collection Photos
 ```
 GET /admin/collections/photos/{id}
 ```
 Get photos from a specific Unsplash collection.
+
+Parameters:
+- `id` (string, required): Collection ID
+
+Response:
+```json
+[
+  {
+    "id": "string",
+    "created_at": "string",
+    "width": "integer",
+    "height": "integer",
+    "color": "string",
+    "blur_hash": "string",
+    "description": "string",
+    "alt_description": "string",
+    "urls": {
+      "raw": "string",
+      "full": "string",
+      "regular": "string",
+      "small": "string",
+      "thumb": "string"
+    },
+    "likes": "integer"
+  }
+]
+```
 
 #### Add Collection
 ```
@@ -104,17 +301,74 @@ GET /admin/add/collections/{name}
 ```
 Add a new collection to the fetching queue.
 
-#### Start Fetching
+Parameters:
+- `name` (string, required): Collection name to add
+
+Response:
+```
+Successfully added
+```
+
+#### Fetch Photos
+```
+GET /admin/photos
+```
+Fetch the next batch of photos from Unsplash collections.
+
+Response:
+```json
+{
+  "wallpapers": [
+    {
+      "_id": "string",
+      "category_id": "string",
+      "created_at": "integer",
+      "width": "integer",
+      "height": "integer",
+      "color": "string",
+      "blur_hash": "string",
+      "description": "string",
+      "image_url": "string",
+      "likes": "integer",
+      "is_premium": "boolean"
+    }
+  ],
+  "count": "integer",
+  "page": "integer",
+  "index": "integer",
+  "isFirst": "boolean"
+}
+```
+
+#### Start Fetching Process
 ```
 GET /start
 ```
 Starts the automated wallpaper fetching and uploading process.
 
-#### Stop Fetching
+Response:
+```
+Started
+```
+or
+```
+Already started
+```
+or
+```
+Collection Over
+```
+
+#### Stop Fetching Process
 ```
 GET /stop
 ```
 Stops the automated fetching process.
+
+Response:
+```
+Stopping
+```
 
 ## How It Works
 
@@ -170,7 +424,7 @@ The server automatically rotates through 6 Unsplash API keys (45 requests per ke
 ## Development
 
 To run in development mode with server restrictions disabled:
-- Set `isServer = false` in `app.ts` (current default)
+- Set `IS_SERVER=false` in `.env` file (current default)
 - This enables admin endpoints for local testing
 
 ## License

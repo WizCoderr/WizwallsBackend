@@ -9,7 +9,7 @@ import { loadFile, saveFile, submitReport } from './FileHandling.js';
 import { Collections } from 'unsplash-js/dist/methods/search/types/response';
 import { delay } from './Utils.js';
 import MongoAPI from './Mongo.js'
-
+import swaggerUi from 'swagger-ui-express';
 
 
 
@@ -610,7 +610,20 @@ function collectCategoryData(collections: Collections) {
   return collectionData
 }
 
+// ---------------- Swagger setup ----------------
+// Swagger UI options
+const swaggerOptions = {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Wallpaper API Documentation'
+};
 
+// Add Swagger UI route - place this after your middleware and before your routes
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerOptions));
+
+// Optional: Add a redirect from root to api-docs for convenience
+app.get('/docs', (req, res) => {
+  res.redirect('/api-docs');
+});
 
 
 
