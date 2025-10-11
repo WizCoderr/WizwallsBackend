@@ -25,7 +25,17 @@ const wallpaperCategorySchema = new Schema({
     blur_hash: { type: String, required: false },
 })
 
+const userSchema = new Schema({
+    _id: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    name: { type: String, required: true },
+    password: { type: String, required: true },
+    isAuthenticated: { type: Boolean, default: false },
+})
+
+
 wallpaperSchema.index({ description: 'text' });
+export const User = mongoose.model("User", userSchema)
 export const Wallpaper = mongoose.model("Wallpaper", wallpaperSchema)
 export const WallpaperCategory = mongoose.model("WallpaperCategory", wallpaperCategorySchema)
 

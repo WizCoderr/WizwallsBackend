@@ -11,7 +11,11 @@ import { delay } from './Utils.js';
 import MongoAPI from './Mongo.js'
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './docs.js';
-
+import {
+  registerUser,
+  loginUser,
+  logout
+} from './auth/auth.js';
 
 dotenv.config()
 
@@ -626,7 +630,10 @@ app.get('/docs', (req, res) => {
   res.redirect('/api-docs');
 });
 
-
+// ---------------- Auth setup ----------------
+app.post('/auth/register', registerUser);
+app.post('/auth/login', loginUser);
+app.post('/auth/logout', logout);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
