@@ -29,4 +29,4 @@ COPY --from=build /usr/src/app/tsconfig.json .
 EXPOSE 3000
 
 # Command to start the application
-CMD ["bun", "src/app.ts"]
+CMD ["bun", "start"]
