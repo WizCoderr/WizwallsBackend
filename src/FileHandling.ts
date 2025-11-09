@@ -3,12 +3,35 @@ import { ProcessStack } from './DataType'
 
 
 export async function loadFile() {
-    let data = await promises.readFile('./src/temp/stack.json', 'utf8')
-    return JSON.parse(data) as ProcessStack
+    const filePath = './src/temp/stack.json'
+    try {
+        let data = await promises.readFile(filePath, 'utf8')
+        return JSON.parse(data) as ProcessStack
+    } catch (error: any) {
+        if (error.code === 'ENOENT') {
+            try {
+                await promises.mkdir('./src/temp', { recursive: true });
+            } catch (dirError) {
+                console.error("Error creating directory:", dirError);
+                throw dirError;
+            }
+
+            const defaultStack: ProcessStack = {
+                apiCount: 0,
+                photoIndex: 0,
+                categoriesName: [],
+                collections: []
+            };
+            await saveFile(defaultStack)
+            return defaultStack
+        } else {
+            throw error
+        }
+    }
 }
 
 export async function saveFile(data: ProcessStack) {
-    const json = JSON.stringify(data)
+    const json = JSON.stringify(data, null, 4)
     await promises.writeFile('./src/temp/stack.json', json)
 }
 
