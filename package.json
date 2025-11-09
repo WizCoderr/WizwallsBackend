@@ -5,7 +5,7 @@
   "main": "app.ts",
   "scripts": {
     "dev": "bun --watch src/app.ts",
-    "start": "bun --watch src/app.ts"
+    "start": "bun src/app.ts"
   },
   "type": "module",
   "author": "wizcoderr",
