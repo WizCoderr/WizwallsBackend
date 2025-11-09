@@ -1,0 +1,35 @@
+name: Build and Deploy Docker
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build-and-deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Build  and push Docker image
+      uses: mr-smithers-excellent/docker-build-push@v5
+      with:
+        image: "wizcoderr/taskmanagerproback"
+        registry: "docker.io"
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+        dockerfile: ./Dockerfile
+        tags: latest
+
+    - name: Trigger Render Deploy Hook
+      env:
+        RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+      run: |
+        if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+          echo "RENDER_DEPLOY_HOOK_URL secret is not set. Skipping Render deployment."
+          exit 1
+        fi
+        echo "Triggering Render deployment..."
+        curl "$RENDER_DEPLOY_HOOK_URL"
+        echo "Render deployment triggered successfully."
